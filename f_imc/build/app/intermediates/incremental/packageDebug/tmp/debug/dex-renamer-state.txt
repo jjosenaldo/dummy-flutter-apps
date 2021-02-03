@@ -1,0 +1,4 @@
+#Wed Feb 03 19:22:11 BRT 2021
+base.0=/home/satan/Dropbox/itamir/projects/f_imc/build/app/intermediates/dex/debug/mergeDexDebug/out/classes.dex
+path.0=classes.dex
+renamed.0=classes.dex
