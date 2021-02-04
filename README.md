@@ -2,4 +2,4 @@ Apps developed as assignments for the "PROGRAMACAO PARA DISPOSITIVOS MOVEIS" und
 
 ### Projects
 
-- (f_imc)[f_imc/]: your average IMC calculator.
+- [f_imc](f_imc/): your average IMC calculator.
