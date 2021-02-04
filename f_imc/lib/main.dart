@@ -28,8 +28,10 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final TextEditingController weightController = TextEditingController();
-  final TextEditingController heightController = TextEditingController();
+  final TextEditingController weightController =
+      TextEditingController(text: '');
+  final TextEditingController heightController =
+      TextEditingController(text: '');
   static const String _kMandatoryFieldError = 'Campo obrigatório.';
   final String? Function(String?) notEmptyValidator = (enteredText) {
     if (enteredText == null) {
@@ -48,13 +50,13 @@ class _MyHomePageState extends State<MyHomePage> {
   String _imcResult = '';
 
   void _clearForm() {
+    formKey.currentState?.reset();
+    heightController.clear();
+    weightController.clear();
+
     setState(() {
       _imcResult = '';
-      heightController.clear();
-      weightController.clear();
     });
-
-    formKey.currentState?.reset();
   }
 
   Widget _padding() => SizedBox(
