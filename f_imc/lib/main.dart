@@ -21,7 +21,7 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key}) : super(key: key);
+  MyHomePage({Key? key}) : super(key: key);
 
   @override
   _MyHomePageState createState() => _MyHomePageState();
@@ -30,16 +30,22 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   final TextEditingController weightController = TextEditingController();
   final TextEditingController heightController = TextEditingController();
-  final String Function(String) notEmptyValidator =
-      (enteredText) => enteredText?.isEmpty ?? true
-          ? 'Campo obrigatório.'
-          : num.tryParse(enteredText) == null
-              ? 'Insira um valor válido.'
-              : num.parse(enteredText) < 0
-                  ? 'O valor deve ser positivo.'
-                  : null;
+  static const String _kMandatoryFieldError = 'Campo obrigatório.';
+  final String? Function(String?) notEmptyValidator = (enteredText) {
+    if (enteredText == null) {
+      return _kMandatoryFieldError;
+    }
+
+    return enteredText.isEmpty
+        ? _kMandatoryFieldError
+        : num.tryParse(enteredText) == null
+            ? 'Insira um valor válido.'
+            : num.parse(enteredText) < 0
+                ? 'O valor deve ser positivo.'
+                : null;
+  };
   static final formKey = GlobalKey<FormState>();
-  String _imcResult;
+  String _imcResult = '';
 
   void _clearForm() {
     setState(() {
@@ -48,7 +54,7 @@ class _MyHomePageState extends State<MyHomePage> {
       weightController.clear();
     });
 
-    formKey.currentState.reset();
+    formKey.currentState?.reset();
   }
 
   Widget _padding() => SizedBox(
@@ -56,7 +62,7 @@ class _MyHomePageState extends State<MyHomePage> {
       );
 
   void _onButtonPressed() {
-    if (formKey.currentState.validate()) {
+    if (formKey.currentState?.validate() ?? false) {
       final weight = num.parse(weightController.text);
       final height = num.parse(heightController.text);
       final imc = weight / pow(height * 0.01, 2);
@@ -133,8 +139,8 @@ class _MyHomePageState extends State<MyHomePage> {
                   textColor: Colors.white,
                 ),
                 Visibility(
-                  visible: _imcResult?.isNotEmpty ?? false,
-                  child: Center(child: Text(_imcResult ?? '')),
+                  visible: _imcResult.isNotEmpty,
+                  child: Center(child: Text(_imcResult)),
                 )
               ],
             ),
