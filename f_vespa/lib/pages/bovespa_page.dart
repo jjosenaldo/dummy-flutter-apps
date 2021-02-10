@@ -11,6 +11,8 @@ class BovespaPage extends StatefulWidget {
 
 class _BovespaPageState extends State<BovespaPage> {
   String? _symbol;
+  bool _isLoadingApiData = false;
+  StockPrice? _stockPrice;
 
   @override
   Widget build(BuildContext context) {
@@ -35,16 +37,35 @@ class _BovespaPageState extends State<BovespaPage> {
               Center(child: Text('eita kkk')),
               DropdownButton<String>(
                 items: availableSymbols.map(buildDropdownMenuItem).toList(),
-                onChanged: (newSymbol) => setState(() => _symbol = newSymbol),
+                onChanged: _isLoadingApiData
+                    ? (_) {}
+                    : (newSymbol) {
+                        setState(() => _symbol = newSymbol);
+                        _loadApiData(_symbol!);
+                      },
                 dropdownColor: Colors.black45,
                 style: _kDefaultTextStyle,
                 value: _symbol,
               ),
+              if (_stockPrice != null)
+                Text(
+                  '${_stockPrice!.name}: ${_stockPrice!.price}',
+                  style: _kDefaultTextStyle,
+                )
             ],
           )
         ],
       ),
     );
+  }
+
+  Future<void> _loadApiData(String symbol) async {
+    setState(() => _isLoadingApiData = true);
+    final stockPrice = await BovespaApi.getStockPrice(symbol);
+    setState(() {
+      _isLoadingApiData = false;
+      _stockPrice = stockPrice;
+    });
   }
 
   DropdownMenuItem<String> buildDropdownMenuItem(String symbol) {
