@@ -24,7 +24,7 @@ NumberFormat currencyFormatBuilder(BuildContext context) =>
     );
 
 class BovespaPage extends StatefulWidget {
-  const BovespaPage({Key? key, this.inTestMode = true}) : super(key: key);
+  const BovespaPage({Key? key, this.inTestMode = false}) : super(key: key);
 
   final bool inTestMode;
 
