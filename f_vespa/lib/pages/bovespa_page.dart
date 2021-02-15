@@ -1,7 +1,10 @@
+import 'dart:async';
+
 import 'package:f_vespa/api/bovespa.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
-const _smallFontSize = 25.0;
+// const _smallFontSize = 25.0;
 const _mediumFontSize = 40.0;
 const _largeFontSize = 50.0;
 const _kPrimaryTextColor = Colors.white;
@@ -9,7 +12,7 @@ final _baseTextStyle = TextStyle(
   color: _kPrimaryTextColor,
   fontFamily: 'Truculenta',
 );
-final _smallTextStyle = _baseTextStyle.copyWith(fontSize: _smallFontSize);
+// final _smallTextStyle = _baseTextStyle.copyWith(fontSize: _smallFontSize);
 final _mediumTextStyle = _baseTextStyle.copyWith(fontSize: _mediumFontSize);
 final _largeTextStyle = _baseTextStyle.copyWith(fontSize: _largeFontSize);
 
@@ -18,13 +21,41 @@ class BovespaPage extends StatefulWidget {
   _BovespaPageState createState() => _BovespaPageState();
 }
 
-class _BovespaPageState extends State<BovespaPage> {
+class _BovespaPageState extends State<BovespaPage>
+    with SingleTickerProviderStateMixin {
   String? _symbol;
-  bool _isLoadingApiData = false;
   StockPrice? _stockPrice;
-  double? _lastPrice;
+  double? _lastDelta;
   final double triangleWidth = 25.0;
   final double triangleHeight = 25.0;
+  late final AnimationController _controller;
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller =
+        AnimationController(vsync: this, duration: Duration(seconds: 2));
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  void _startTimer(String? symbol) {
+    if (_timer?.isActive ?? false) {
+      _timer!.cancel();
+    }
+
+    if (symbol != null) {
+      _timer = Timer.periodic(Duration(seconds: 10), (timer) async {
+        await _loadApiData(symbol);
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -49,12 +80,17 @@ class _BovespaPageState extends State<BovespaPage> {
               Center(
                 child: DropdownButton<String>(
                   items: availableSymbols.map(buildDropdownMenuItem).toList(),
-                  onChanged: _isLoadingApiData
-                      ? (_) {}
-                      : (newSymbol) {
-                          setState(() => _symbol = newSymbol);
-                          _loadApiData(_symbol!);
-                        },
+                  onChanged: (newSymbol) async {
+                    _stockPrice = null;
+                    _startTimer(newSymbol);
+
+                    setState(() {
+                      _symbol = newSymbol;
+                    });
+
+                    _controller.reset();
+                    _controller.forward();
+                  },
                   iconEnabledColor: Colors.white,
                   dropdownColor: Colors.black,
                   hint: Text(
@@ -67,49 +103,13 @@ class _BovespaPageState extends State<BovespaPage> {
                   iconSize: 50,
                 ),
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Container(
-                    width: triangleWidth,
-                    height: triangleHeight,
-                    child: CustomPaint(
-                      painter: TrianglePainter(
-                        width: triangleWidth,
-                        height: triangleHeight,
-                        type: 1 > 10
-                            ? TrianglePainterType.up
-                            : TrianglePainterType.down,
-                      ),
-                    ),
-                  ),
-                  Text(
-                    'R\$52,00',
-                    style: _mediumTextStyle,
-                  )
-                ],
-              ),
-              if (_stockPrice != null)
-                Column(
-                  children: [
-                    Text(
-                      '${_stockPrice!.name}: ${_stockPrice!.price}',
-                      style: _mediumTextStyle,
-                    ),
-                    if (_lastPrice != null && _stockPrice != null)
-                      if (_lastPrice != _stockPrice!.price)
-                        CustomPaint(
-                          painter: TrianglePainter(
-                            width: triangleWidth,
-                            height: triangleHeight,
-                            type: _lastPrice! > _stockPrice!.price
-                                ? TrianglePainterType.up
-                                : TrianglePainterType.down,
-                          ),
-                        )
-                  ],
+              Container(
+                height: 200,
+                child: AnimatedChange(
+                  delta: _lastDelta,
+                  positionController: _controller,
                 ),
+              ),
             ],
           )
         ],
@@ -118,12 +118,15 @@ class _BovespaPageState extends State<BovespaPage> {
   }
 
   Future<void> _loadApiData(String symbol) async {
-    setState(() => _isLoadingApiData = true);
     final stockPrice = await BovespaApi.getStockPrice(symbol);
-    setState(() {
-      _isLoadingApiData = false;
-      _stockPrice = stockPrice;
-    });
+
+    if (stockPrice != null) {
+      setState(() {
+        _lastDelta =
+            _stockPrice == null ? null : _stockPrice!.price - stockPrice.price;
+        _stockPrice = stockPrice;
+      });
+    }
   }
 
   DropdownMenuItem<String> buildDropdownMenuItem(String symbol) {
@@ -133,6 +136,62 @@ class _BovespaPageState extends State<BovespaPage> {
         style: _mediumTextStyle,
       ),
       value: symbol,
+    );
+  }
+}
+
+class AnimatedChange extends AnimatedWidget {
+  AnimatedChange({
+    Key? key,
+    required this.delta,
+    required this.positionController,
+    this.triangleWidth = 25.0,
+    this.triangleHeight = 25.0,
+    this.animationLength = 200.0,
+  }) : super(key: key, listenable: positionController);
+  final double? delta;
+  final double triangleWidth;
+  final double triangleHeight;
+  final Animation<double> positionController;
+  final double animationLength;
+
+  @override
+  Widget build(BuildContext context) {
+    final _currencyFormat = NumberFormat.simpleCurrency(
+      locale: '${Localizations.localeOf(context)}',
+      name: 'R\$',
+    );
+
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        Positioned(
+          top: (1 - positionController.value) * animationLength,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Container(
+                width: triangleWidth,
+                height: triangleHeight,
+                child: CustomPaint(
+                  painter: TrianglePainter(
+                    width: triangleWidth,
+                    height: triangleHeight,
+                    type: delta == null || (delta != null && delta! >= 0)
+                        ? TrianglePainterType.up
+                        : TrianglePainterType.down,
+                  ),
+                ),
+              ),
+              Text(
+                '${delta != null ? _currencyFormat.format(delta!.abs()) : '-'}',
+                style: _mediumTextStyle,
+              )
+            ],
+          ),
+        ),
+      ],
     );
   }
 }
