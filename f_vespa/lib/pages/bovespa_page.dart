@@ -110,14 +110,17 @@ class _BovespaPageState extends State<BovespaPage>
   }
 
   Future<void> _loadApiData(String symbol) async {
-    // final stockPrice = await BovespaApi.getStockPrice(symbol);
-    final stockPrice =
-        await Future.delayed(Duration(milliseconds: 3000)).then<StockPrice>(
-      (_) => StockPrice(
-          lastUpdate: DateTime.now(),
-          name: 'eita',
-          price: (Random().nextDouble() - 0.5) * 10.0),
-    );
+    final stockPrice = await BovespaApi.getStockPrice(symbol);
+    // For testing:
+    //
+    // final stockPrice =
+    //     await Future.delayed(Duration(milliseconds: 3000)).then<StockPrice>(
+    //   (_) => StockPrice(
+    //     lastUpdate: DateTime.now(),
+    //     name: 'eita',
+    //     price: (Random().nextDouble() - 0.5) * 10.0,
+    //   ),
+    // );
     if (stockPrice != null) {
       setState(() {
         _lastDelta =
