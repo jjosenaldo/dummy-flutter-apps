@@ -1,20 +1,27 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:f_vespa/api/bovespa.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-// const _smallFontSize = 25.0;
+const _smallFontSize = 25.0;
 const _mediumFontSize = 40.0;
-const _largeFontSize = 50.0;
+const _largeFontSize = 60.0;
 const _kPrimaryTextColor = Colors.white;
 final _baseTextStyle = TextStyle(
   color: _kPrimaryTextColor,
   fontFamily: 'Truculenta',
 );
-// final _smallTextStyle = _baseTextStyle.copyWith(fontSize: _smallFontSize);
+final _smallTextStyle = _baseTextStyle.copyWith(fontSize: _smallFontSize);
 final _mediumTextStyle = _baseTextStyle.copyWith(fontSize: _mediumFontSize);
 final _largeTextStyle = _baseTextStyle.copyWith(fontSize: _largeFontSize);
+
+NumberFormat currencyFormatBuilder(BuildContext context) =>
+    NumberFormat.simpleCurrency(
+      locale: '${Localizations.localeOf(context)}',
+      name: 'R\$',
+    );
 
 class BovespaPage extends StatefulWidget {
   @override
@@ -30,6 +37,7 @@ class _BovespaPageState extends State<BovespaPage>
   final double triangleHeight = 25.0;
   late final AnimationController _controller;
   Timer? _timer;
+  bool _firstLoading = false;
 
   @override
   void initState() {
@@ -45,13 +53,14 @@ class _BovespaPageState extends State<BovespaPage>
     super.dispose();
   }
 
-  void _startTimer(String? symbol) {
+  Future<void> _startTimer(String? symbol) async {
     if (_timer?.isActive ?? false) {
       _timer!.cancel();
     }
 
     if (symbol != null) {
-      _timer = Timer.periodic(Duration(seconds: 10), (timer) async {
+      await _loadApiData(symbol);
+      _timer = Timer.periodic(Duration(seconds: 5), (timer) async {
         await _loadApiData(symbol);
       });
     }
@@ -77,32 +86,15 @@ class _BovespaPageState extends State<BovespaPage>
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Center(
-                child: DropdownButton<String>(
-                  items: availableSymbols.map(buildDropdownMenuItem).toList(),
-                  onChanged: (newSymbol) async {
-                    _stockPrice = null;
-                    _startTimer(newSymbol);
-
-                    setState(() {
-                      _symbol = newSymbol;
-                    });
-
-                    _controller.reset();
-                    _controller.forward();
-                  },
-                  iconEnabledColor: Colors.white,
-                  dropdownColor: Colors.black,
-                  hint: Text(
-                    'Símbolo',
-                    style: _mediumTextStyle,
+              _symbolsDropdown(),
+              if (_stockPrice?.price != null)
+                Center(
+                  child: Text(
+                    currencyFormatBuilder(context).format(_stockPrice!.price),
+                    style: _largeTextStyle,
                   ),
-                  style: _largeTextStyle,
-                  value: _symbol,
-                  isDense: true,
-                  iconSize: 50,
                 ),
-              ),
+              SizedBox(height: 10),
               Container(
                 height: 200,
                 child: AnimatedChange(
@@ -118,18 +110,61 @@ class _BovespaPageState extends State<BovespaPage>
   }
 
   Future<void> _loadApiData(String symbol) async {
-    final stockPrice = await BovespaApi.getStockPrice(symbol);
-
+    // final stockPrice = await BovespaApi.getStockPrice(symbol);
+    final stockPrice =
+        await Future.delayed(Duration(milliseconds: 3000)).then<StockPrice>(
+      (_) => StockPrice(
+          lastUpdate: DateTime.now(),
+          name: 'eita',
+          price: (Random().nextDouble() - 0.5) * 10.0),
+    );
     if (stockPrice != null) {
       setState(() {
         _lastDelta =
-            _stockPrice == null ? null : _stockPrice!.price - stockPrice.price;
+            _stockPrice == null ? null : stockPrice.price - _stockPrice!.price;
+        if (_lastDelta != null) {
+          _controller.reset();
+          _controller.forward();
+        }
         _stockPrice = stockPrice;
       });
     }
   }
 
-  DropdownMenuItem<String> buildDropdownMenuItem(String symbol) {
+  Widget _symbolsDropdown() => _firstLoading
+      ? Center(
+          child: CircularProgressIndicator(
+          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+        ))
+      : Center(
+          child: DropdownButton<String>(
+            items: availableSymbols.map(_dropdownMenuItem).toList(),
+            onChanged: (newSymbol) async {
+              setState(() {
+                _firstLoading = true;
+              });
+              _stockPrice = null;
+              await _startTimer(newSymbol);
+
+              setState(() {
+                _symbol = newSymbol;
+                _firstLoading = false;
+              });
+            },
+            iconEnabledColor: Colors.white,
+            dropdownColor: Colors.black,
+            hint: Text(
+              'Símbolo',
+              style: _mediumTextStyle,
+            ),
+            style: _largeTextStyle,
+            value: _symbol,
+            isDense: true,
+            iconSize: 50,
+          ),
+        );
+
+  DropdownMenuItem<String> _dropdownMenuItem(String symbol) {
     return DropdownMenuItem(
       child: Text(
         symbol,
@@ -145,8 +180,8 @@ class AnimatedChange extends AnimatedWidget {
     Key? key,
     required this.delta,
     required this.positionController,
-    this.triangleWidth = 25.0,
-    this.triangleHeight = 25.0,
+    this.triangleWidth = 15.0,
+    this.triangleHeight = 15.0,
     this.animationLength = 200.0,
   }) : super(key: key, listenable: positionController);
   final double? delta;
@@ -157,10 +192,7 @@ class AnimatedChange extends AnimatedWidget {
 
   @override
   Widget build(BuildContext context) {
-    final _currencyFormat = NumberFormat.simpleCurrency(
-      locale: '${Localizations.localeOf(context)}',
-      name: 'R\$',
-    );
+    final _currencyFormat = currencyFormatBuilder(context);
 
     return Stack(
       alignment: Alignment.center,
@@ -184,9 +216,10 @@ class AnimatedChange extends AnimatedWidget {
                   ),
                 ),
               ),
+              SizedBox(width: 10),
               Text(
                 '${delta != null ? _currencyFormat.format(delta!.abs()) : '-'}',
-                style: _mediumTextStyle,
+                style: _smallTextStyle,
               )
             ],
           ),
