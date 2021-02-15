@@ -2,18 +2,17 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 
-const _apiKey = '';
+const _kApiKey = 'MY_API_KEY';
 const _kBaseUrl = 'api.hgbrasil.com';
-
-String _buildStockPriceRequestPath(String symbol) =>
-    'finance/stock_price?key=$_apiKey&symbol=$symbol';
+const _kPricePath = 'finance/stock_price';
 
 Future<Map<String, dynamic>> getStockPriceJson(String symbol) async {
-  String path = _buildStockPriceRequestPath(symbol);
-  final response = await http.get(Uri.https(_kBaseUrl, path));
+  final headers = {'key': _kApiKey, 'symbol': symbol};
+  final uri = Uri.https(_kBaseUrl, _kPricePath, headers);
+  final response = await http.get(uri);
 
   if (response.statusCode == 200) {
-    return jsonDecode(response.body);
+    return jsonDecode(response.body)['results'][symbol];
   } else {
     return {};
   }

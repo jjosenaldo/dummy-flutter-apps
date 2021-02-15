@@ -24,6 +24,10 @@ NumberFormat currencyFormatBuilder(BuildContext context) =>
     );
 
 class BovespaPage extends StatefulWidget {
+  const BovespaPage({Key? key, this.inTestMode = true}) : super(key: key);
+
+  final bool inTestMode;
+
   @override
   _BovespaPageState createState() => _BovespaPageState();
 }
@@ -32,7 +36,7 @@ class _BovespaPageState extends State<BovespaPage>
     with SingleTickerProviderStateMixin {
   String? _symbol;
   StockPrice? _stockPrice;
-  double? _lastDelta;
+  double? _delta;
   final double triangleWidth = 25.0;
   final double triangleHeight = 25.0;
   late final AnimationController _controller;
@@ -43,7 +47,7 @@ class _BovespaPageState extends State<BovespaPage>
   void initState() {
     super.initState();
     _controller =
-        AnimationController(vsync: this, duration: Duration(seconds: 2));
+        AnimationController(vsync: this, duration: Duration(seconds: 1));
   }
 
   @override
@@ -98,8 +102,9 @@ class _BovespaPageState extends State<BovespaPage>
               Container(
                 height: 200,
                 child: AnimatedChange(
-                  delta: _lastDelta,
+                  delta: _delta,
                   positionController: _controller,
+                  animationLength: 100,
                 ),
               ),
             ],
@@ -110,22 +115,38 @@ class _BovespaPageState extends State<BovespaPage>
   }
 
   Future<void> _loadApiData(String symbol) async {
-    final stockPrice = await BovespaApi.getStockPrice(symbol);
-    // For testing:
-    //
-    // final stockPrice =
-    //     await Future.delayed(Duration(milliseconds: 3000)).then<StockPrice>(
-    //   (_) => StockPrice(
-    //     lastUpdate: DateTime.now(),
-    //     name: 'eita',
-    //     price: (Random().nextDouble() - 0.5) * 10.0,
-    //   ),
-    // );
+    debugPrint('loading API data...');
+    late final stockPrice;
+
+    if (widget.inTestMode) {
+      stockPrice =
+          await Future.delayed(Duration(milliseconds: 1500)).then<StockPrice>(
+        (_) => StockPrice(
+          lastUpdate: DateTime.now(),
+          name: 'test_symbol',
+          price: (Random().nextInt(4) - 2),
+        ),
+      );
+    } else {
+      stockPrice = await BovespaApi.getStockPrice(symbol);
+    }
+
+    debugPrint('API data loaded.');
+
     if (stockPrice != null) {
+      late final newDelta;
+
+      if (_stockPrice == null) {
+        newDelta = null;
+      } else {
+        final double actualDelta = stockPrice.price - _stockPrice!.price;
+        newDelta = actualDelta != 0 ? actualDelta : null;
+      }
+
       setState(() {
-        _lastDelta =
-            _stockPrice == null ? null : stockPrice.price - _stockPrice!.price;
-        if (_lastDelta != null) {
+        _delta = newDelta;
+
+        if (_delta != null) {
           _controller.reset();
           _controller.forward();
         }
@@ -197,38 +218,40 @@ class AnimatedChange extends AnimatedWidget {
   Widget build(BuildContext context) {
     final _currencyFormat = currencyFormatBuilder(context);
 
-    return Stack(
-      alignment: Alignment.center,
-      children: [
-        Positioned(
-          top: (1 - positionController.value) * animationLength,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
+    return delta == null
+        ? Text('-')
+        : Stack(
+            alignment: Alignment.center,
             children: [
-              Container(
-                width: triangleWidth,
-                height: triangleHeight,
-                child: CustomPaint(
-                  painter: TrianglePainter(
-                    width: triangleWidth,
-                    height: triangleHeight,
-                    type: delta == null || (delta != null && delta! >= 0)
-                        ? TrianglePainterType.up
-                        : TrianglePainterType.down,
-                  ),
+              Positioned(
+                top: (1 - positionController.value) * animationLength,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Container(
+                      width: triangleWidth,
+                      height: triangleHeight,
+                      child: CustomPaint(
+                        painter: TrianglePainter(
+                          width: triangleWidth,
+                          height: triangleHeight,
+                          type: delta == null || (delta != null && delta! >= 0)
+                              ? TrianglePainterType.up
+                              : TrianglePainterType.down,
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 10),
+                    Text(
+                      '${_currencyFormat.format(delta!.abs())}',
+                      style: _smallTextStyle,
+                    ),
+                  ],
                 ),
               ),
-              SizedBox(width: 10),
-              Text(
-                '${delta != null ? _currencyFormat.format(delta!.abs()) : '-'}',
-                style: _smallTextStyle,
-              )
             ],
-          ),
-        ),
-      ],
-    );
+          );
   }
 }
 
