@@ -12,10 +12,19 @@ This is your average IMC calculator.
 
 ### [f_vespa](f_vespa/)
 This app shows real-time changes on stock prices from the Bovespa stocks index. It uses data coming from the [hgbrasil](https://www.hgbrasil.com)'s API.
-#### What Flutter features it showcases
+
+#### Flutter features showcased
 - Web API consuming;
 - Animations (by extending AnimatedWidget);
 - CustomPainter.
 
 #### How to build
 If you want to build the project, you have to set the variable `_kApiKey` in the [lib/api/http.dart](f_vespa/lib/api/http.dart) file to an actual API key from hgbrasil.
+
+### [f_list](f_list/)
+Your almost-average todo list app. 
+
+#### Flutter features showcased
+- Snackbar;
+- Dismissible items;
+- RefreshIndicator.
