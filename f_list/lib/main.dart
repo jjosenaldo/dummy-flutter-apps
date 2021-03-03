@@ -73,6 +73,9 @@ class _TodoListScreenState extends State<TodoListScreen> {
                     width: 4,
                   ),
                   ElevatedButton(
+                      style: ButtonStyle(
+                          backgroundColor:
+                              MaterialStateProperty.all(Color(0xff62c511))),
                       onPressed: () {
                         if (formKey.currentState?.validate() ?? false) {
                           setState(() {
