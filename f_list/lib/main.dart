@@ -112,8 +112,8 @@ class TodoListTile extends StatelessWidget {
     return ListTile(
       title: title,
       leading: Icon(
-        finished ? Icons.check_circle : Icons.cancel,
-        color: finished ? Colors.green : Colors.red,
+        finished ? Icons.check_circle : Icons.error,
+        color: finished ? Colors.green : Colors.orange,
       ),
       trailing: Checkbox(
         onChanged: (value) {
