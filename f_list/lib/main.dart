@@ -179,6 +179,12 @@ class TodoListTile extends StatelessWidget {
         ));
       },
       background: Container(
+        child: Align(
+            alignment: Alignment.centerLeft,
+            child: Padding(
+              padding: const EdgeInsets.only(left: 8.0),
+              child: Icon(Icons.delete, color: Colors.white),
+            )),
         color: Colors.orange,
       ),
       child: ListTile(
