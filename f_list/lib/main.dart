@@ -27,6 +27,8 @@ class _TodoListScreenState extends State<TodoListScreen> {
   final TextEditingController _taskTitleController = TextEditingController();
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   bool _autovalidate = false;
+  int _nextTaskId = 0;
+  Task? _lastTaskDismissed;
 
   @override
   void dispose() {
@@ -83,8 +85,10 @@ class _TodoListScreenState extends State<TodoListScreen> {
                             _tasks.insert(
                                 0,
                                 Task(
-                                    finished: false,
-                                    title: _taskTitleController.text));
+                                  finished: false,
+                                  title: _taskTitleController.text,
+                                  id: _nextTaskId++,
+                                ));
                             _taskTitleController.text = '';
                           });
                         } else {
@@ -103,6 +107,12 @@ class _TodoListScreenState extends State<TodoListScreen> {
                       setState(() => _sortTasksUnfinishedFirst()),
                   child: ListView.builder(
                     itemBuilder: (context, index) => TodoListTile(
+                      onDismisssedCanceled: () => setState(
+                          () => _tasks.insert(index, _lastTaskDismissed!)),
+                      onDismissed: () {
+                        _lastTaskDismissed = _tasks[index];
+                        setState(() => _tasks.removeAt(index));
+                      },
                       onChanged: (finished) {
                         setState(() {
                           _tasks[index].finished = finished;
@@ -126,39 +136,65 @@ class Task {
   Task({
     required this.title,
     required this.finished,
+    required this.id,
   });
 
   bool finished;
   final String title;
+  final int id;
 }
 
 class TodoListTile extends StatelessWidget {
   TodoListTile({
     required Task task,
     required this.onChanged,
+    required this.onDismissed,
+    required this.onDismisssedCanceled,
   })   : finished = task.finished,
         title = Text(task.title),
+        dismissibleKey = Key('${task.id}'),
         super(key: ValueKey(task.title));
 
   final bool finished;
   final Text title;
   final ValueChanged<bool> onChanged;
+  final Key dismissibleKey;
+  final VoidCallback onDismissed;
+  final VoidCallback onDismisssedCanceled;
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      title: title,
-      leading: Icon(
-        finished ? Icons.check_circle : Icons.error,
-        color: finished ? Colors.green : Colors.orange,
+    return Dismissible(
+      key: dismissibleKey,
+      onDismissed: (_) {
+        onDismissed();
+        ScaffoldMessenger.of(context).removeCurrentSnackBar();
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Tarefa ${title.data} removida.'),
+          action: SnackBarAction(
+            label: 'Desfazer',
+            onPressed: onDismisssedCanceled,
+          ),
+          duration: Duration(seconds: 3),
+        ));
+      },
+      background: Container(
+        color: Colors.orange,
       ),
-      trailing: Checkbox(
-        onChanged: (value) {
-          if (value != null) {
-            onChanged(value);
-          }
-        },
-        value: finished,
+      child: ListTile(
+        title: title,
+        leading: Icon(
+          finished ? Icons.check_circle : Icons.error,
+          color: finished ? Colors.green : Colors.orange,
+        ),
+        trailing: Checkbox(
+          onChanged: (value) {
+            if (value != null) {
+              onChanged(value);
+            }
+          },
+          value: finished,
+        ),
       ),
     );
   }
