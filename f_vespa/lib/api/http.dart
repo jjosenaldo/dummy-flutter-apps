@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 
-const _kApiKey = 'MY_API_KEY';
+const _kApiKey = '0f72763a';
 const _kBaseUrl = 'api.hgbrasil.com';
 const _kPricePath = 'finance/stock_price';
 
