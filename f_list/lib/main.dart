@@ -166,6 +166,7 @@ class TodoListTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return Dismissible(
       key: dismissibleKey,
+      direction: DismissDirection.startToEnd,
       onDismissed: (_) {
         onDismissed();
         ScaffoldMessenger.of(context).removeCurrentSnackBar();
