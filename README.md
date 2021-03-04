@@ -24,7 +24,11 @@ If you want to build the project, you have to set the variable `_kApiKey` in the
 ### [f_list](f_list/)
 Your almost-average todo list app. 
 
+#### Features
+- Local storage persistence.
+
 #### Flutter features showcased
 - Snackbar;
 - Dismissible items;
-- RefreshIndicator.
+- RefreshIndicator;
+- Persistence in the documents path.
