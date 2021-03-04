@@ -1,4 +1,30 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
+
+class StorageService {
+  const StorageService._();
+  factory StorageService() {
+    return _instance;
+  }
+  static StorageService _instance = StorageService._();
+
+  Future<String> _getDocumentsPath() async =>
+      (await getApplicationDocumentsDirectory()).path;
+
+  Future<String> _getFileName() async =>
+      '${await _getDocumentsPath()}/todolist.json';
+
+  Future<File> _getFile() async => File(await _getFileName());
+
+  Future<void> writeJsonList(List<dynamic> jsonData) async =>
+      (await _getFile()).writeAsString(jsonEncode(jsonData));
+
+  Future<List<dynamic>> readJsonList() async =>
+      jsonDecode(await (await _getFile()).readAsString()) as List<dynamic>;
+}
 
 void main() {
   runApp(TodoListApp());
@@ -31,8 +57,35 @@ class _TodoListScreenState extends State<TodoListScreen> {
   Task? _lastTaskDismissed;
 
   @override
-  void dispose() {
+  void initState() {
+    final widgetsBindingInstance = WidgetsBinding.instance;
+    if (widgetsBindingInstance != null) {
+      widgetsBindingInstance.addPostFrameCallback((timeStamp) async {
+        final storage = StorageService();
+
+        try {
+          final jsonList = await storage.readJsonList();
+          setState(() {
+            _tasks.addAll(jsonList
+                .map((taskJson) =>
+                    Task.fromJson(taskJson as Map<String, dynamic>))
+                .toList());
+          });
+        } on Exception {}
+      });
+    }
+
+    super.initState();
+  }
+
+  @override
+  Future<void> dispose() async {
     _taskTitleController.dispose();
+    Future.delayed(Duration.zero, () async {
+      await StorageService()
+          .writeJsonList(_tasks.map((task) => task.toJson()).toList());
+    });
+
     super.dispose();
   }
 
@@ -138,6 +191,17 @@ class Task {
     required this.finished,
     required this.id,
   });
+
+  Map<String, dynamic> toJson() => {
+        'title': title,
+        'finished': finished,
+        'id': id,
+      };
+  factory Task.fromJson(Map<String, dynamic> jsonTask) => Task(
+        title: jsonTask['title'] as String,
+        id: jsonTask['id'] as int,
+        finished: jsonTask['finished'] as bool,
+      );
 
   bool finished;
   final String title;
