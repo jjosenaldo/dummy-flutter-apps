@@ -1,0 +1,1 @@
+class NullDatabasesPathException implements Exception {}
