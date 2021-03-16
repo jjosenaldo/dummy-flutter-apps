@@ -1,0 +1,4 @@
+#Mon Feb 15 19:04:01 BRT 2021
+base.0=/home/satan/repos/dummy-flutter-apps/f_vespa/build/app/intermediates/dex/release/minifyReleaseWithR8/classes.dex
+path.0=classes.dex
+renamed.0=classes.dex

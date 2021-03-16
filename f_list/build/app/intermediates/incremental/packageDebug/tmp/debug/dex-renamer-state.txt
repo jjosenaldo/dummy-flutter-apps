@@ -1,0 +1,4 @@
+#Wed Mar 03 23:03:29 BRT 2021
+base.0=/home/satan/repos/dummy-flutter-apps/f_list/build/app/intermediates/dex/debug/mergeDexDebug/classes.dex
+renamed.0=classes.dex
+path.0=classes.dex
