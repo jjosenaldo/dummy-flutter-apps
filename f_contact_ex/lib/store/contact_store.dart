@@ -4,8 +4,10 @@ import 'package:flutter_modular/flutter_modular.dart';
 import 'package:mobx/mobx.dart';
 
 class ContactStore {
-  final contacts = Observable(ObservableList.of(<Contact>[]));
+  final _contacts = Observable(ObservableList.of(<Contact>[]));
   final repository = Modular.get<ContactRepository>();
+
+  List<Contact> get contacts => _contacts.value;
 
   Future<void> insertContact({
     required String name,
@@ -21,9 +23,9 @@ class ContactStore {
           photoName: photoName.isEmpty ? null : photoName,
         );
         if (maybeNewContact != null) {
-          final oldContacts = contacts.value;
+          final oldContacts = _contacts.value;
           oldContacts.add(maybeNewContact);
-          contacts.value = oldContacts;
+          _contacts.value = oldContacts;
         }
       })();
 }
