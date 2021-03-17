@@ -1,11 +1,11 @@
 import 'package:f_contact_ex/model/contact.dart';
 
 abstract class ContactRepository {
-  Future<int?> insert({
+  Future<Contact?> insert({
     required String name,
     required String phone,
     required String email,
-    String photoName,
+    String? photoName,
   });
 
   Future<List<Contact>> findAll();
@@ -14,8 +14,8 @@ abstract class ContactRepository {
 
   Future<void> update({
     required int id,
-    String name,
-    String phone,
-    String photoName,
+    required String name,
+    required String phone,
+    String? photoName,
   });
 }

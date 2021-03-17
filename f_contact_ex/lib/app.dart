@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-
-import 'pages/contacts_page.dart';
+import 'package:flutter_modular/flutter_modular.dart';
 
 class App extends StatelessWidget {
   @override
@@ -10,7 +9,7 @@ class App extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: ContactsPage(),
-    );
+      initialRoute: '/',
+    ).modular();
   }
 }

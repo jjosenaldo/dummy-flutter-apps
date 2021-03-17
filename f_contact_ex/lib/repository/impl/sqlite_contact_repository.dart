@@ -13,13 +13,13 @@ class SQLiteContactRepository implements ContactRepository {
   }
 
   @override
-  Future<int?> insert({
+  Future<Contact?> insert({
     required String name,
     required String phone,
     required String email,
     String? photoName,
-  }) {
-    return _dbService.insert(
+  }) async {
+    final insertedId = await _dbService.insert(
       tableName: kTableName,
       data: buildDatabaseInsertJson(
         email: email,
@@ -28,6 +28,10 @@ class SQLiteContactRepository implements ContactRepository {
         photoName: photoName,
       ),
     );
+
+    return insertedId == null
+        ? null
+        : Contact(id: insertedId, name: name, email: email, phone: phone);
   }
 
   Future<List<Contact>> findAll() async {
