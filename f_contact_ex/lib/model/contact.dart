@@ -12,4 +12,9 @@ class Contact {
   final String email;
   final String phone;
   final String? photoName;
+
+  @override
+  String toString() {
+    return '[$id] $name, $phone, $email, ${photoName ?? ''}';
+  }
 }

@@ -6,7 +6,11 @@ import '../contact_repository.dart';
 class SQLiteContactRepository implements ContactRepository {
   late final DBService _dbService;
 
-  set dbService(DBService service) => _dbService = service;
+  SQLiteContactRepository({
+    required DBService service,
+  }) {
+    _dbService = service;
+  }
 
   @override
   Future<int?> insert({
@@ -15,11 +19,22 @@ class SQLiteContactRepository implements ContactRepository {
     required String email,
     String? photoName,
   }) {
-    return Future.value(0);
+    return _dbService.insert(
+      tableName: kTableName,
+      data: buildDatabaseInsertJson(
+        email: email,
+        name: name,
+        phone: phone,
+        photoName: photoName,
+      ),
+    );
   }
 
-  Future<List<Contact>> findAll() {
-    return Future.value([]);
+  Future<List<Contact>> findAll() async {
+    final jsons = await _dbService.findAll(tableName: kTableName);
+    return jsons
+        .map((contactJson) => buildContactFromQueryJson(contactJson))
+        .toList();
   }
 
   Future<List<Contact>> findByName(String name) {

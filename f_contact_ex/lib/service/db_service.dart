@@ -45,4 +45,20 @@ class DBService {
       throw NullDatabasesPathException();
     }
   }
+
+  Future<int?> insert({
+    required String tableName,
+    required Map<String, dynamic> data,
+  }) async {
+    final database = await getDatabase();
+    final insertedId = await database.insert(tableName, data);
+    return insertedId == 0 ? null : insertedId;
+  }
+
+  Future<List<Map<String, dynamic>>> findAll({
+    required String tableName,
+  }) async {
+    final database = await getDatabase();
+    return database.query(tableName);
+  }
 }
