@@ -20,11 +20,14 @@ class ContactsPage extends StatelessWidget {
         },
         child: Icon(Icons.add),
       ),
-      body: Observer(
-        builder: (context) => ListView.builder(
-          itemBuilder: (context, index) =>
-              ContactCard(contact: _contactStore.contacts[index]),
-          itemCount: _contactStore.contacts.length,
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+        child: Observer(
+          builder: (context) => ListView.builder(
+            itemBuilder: (context, index) =>
+                ContactCard(contact: _contactStore.contacts[index]),
+            itemCount: _contactStore.contacts.length,
+          ),
         ),
       ),
     );
