@@ -1,4 +1,3 @@
-import 'package:f_contact_ex/repository/impl/sqlite_contact_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'app.dart';

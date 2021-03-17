@@ -4,8 +4,8 @@ import 'package:flutter_modular/flutter_modular.dart';
 
 class ContactModule extends Module {
   @override
-  final List<ChildRoute> routes = [
-    ChildRoute('/contact', child: (_, __) => ContactsPage())
+  final List<ModularRoute> routes = [
+    ChildRoute('/', child: (_, __) => ContactsPage())
   ];
 
   @override
