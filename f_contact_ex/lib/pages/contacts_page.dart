@@ -1,12 +1,12 @@
 import 'package:f_contact_ex/model/contact.dart';
 import 'package:f_contact_ex/repository/contact_repository.dart';
-import 'package:f_contact_ex/store/contact_store.dart';
+import 'package:f_contact_ex/store/contacts_store.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 
 class ContactsPage extends StatelessWidget {
-  final _contactStore = Modular.get<ContactStore>();
+  final _contactStore = Modular.get<ContactsStore>();
 
   @override
   Widget build(BuildContext context) {

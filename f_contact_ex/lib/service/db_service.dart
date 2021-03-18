@@ -68,4 +68,17 @@ class DBService {
     final database = await getDatabase();
     return database.query(tableName);
   }
+
+  Future<void> updateByColumnEqualTo({
+    required String tableName,
+    required String columnName,
+    required Object columnValue,
+    required Map<String, dynamic> data,
+  }) async {
+    final database = await getDatabase();
+    final sqlColumnValue =
+        columnValue is String ? "'$columnValue'" : columnValue;
+    database.update(tableName, data,
+        where: '$columnName = $sqlColumnValue', whereArgs: [columnValue]);
+  }
 }

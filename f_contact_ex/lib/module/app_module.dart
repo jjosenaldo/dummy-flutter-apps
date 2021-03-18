@@ -8,7 +8,7 @@ import 'package:flutter_modular/flutter_modular.dart';
 class AppModule extends Module {
   @override
   final List<ModularRoute> routes = [
-    ModuleRoute('/contact', module: ContactModule()),
+    ModuleRoute('/contact', module: ContactsModule()),
   ];
 
   @override

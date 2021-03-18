@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'add_contact_store.dart';
+part of 'contact_page_store.dart';
 
 // **************************************************************************
 // StoreGenerator
@@ -8,17 +8,17 @@ part of 'add_contact_store.dart';
 
 // ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic
 
-mixin _$AddContactStore on _AddContactStore, Store {
+mixin _$ContactPageStore on _ContactPageStore, Store {
   Computed<ContactInsertParams>? _$contactInsertParamsComputed;
 
   @override
   ContactInsertParams get contactInsertParams =>
       (_$contactInsertParamsComputed ??= Computed<ContactInsertParams>(
               () => super.contactInsertParams,
-              name: '_AddContactStore.contactInsertParams'))
+              name: '_ContactPageStore.contactInsertParams'))
           .value;
 
-  final _$nameAtom = Atom(name: '_AddContactStore.name');
+  final _$nameAtom = Atom(name: '_ContactPageStore.name');
 
   @override
   String get name {
@@ -33,7 +33,7 @@ mixin _$AddContactStore on _AddContactStore, Store {
     });
   }
 
-  final _$emailAtom = Atom(name: '_AddContactStore.email');
+  final _$emailAtom = Atom(name: '_ContactPageStore.email');
 
   @override
   String get email {
@@ -48,7 +48,7 @@ mixin _$AddContactStore on _AddContactStore, Store {
     });
   }
 
-  final _$phoneAtom = Atom(name: '_AddContactStore.phone');
+  final _$phoneAtom = Atom(name: '_ContactPageStore.phone');
 
   @override
   String get phone {
@@ -63,7 +63,7 @@ mixin _$AddContactStore on _AddContactStore, Store {
     });
   }
 
-  final _$photoNameAtom = Atom(name: '_AddContactStore.photoName');
+  final _$photoNameAtom = Atom(name: '_ContactPageStore.photoName');
 
   @override
   String? get photoName {

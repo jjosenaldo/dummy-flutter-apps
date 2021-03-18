@@ -3,6 +3,27 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 
+class MyModuleRoute<T> extends _ModularRouteImpl<T> {
+  MyModuleRoute(
+    String routerName, {
+    required Module module,
+    List<RouteGuard>? guards,
+    TransitionType transition = TransitionType.defaultTransition,
+    CustomTransition? customTransition,
+    RouteBuilder<T>? routeGenerator,
+    Duration duration = const Duration(milliseconds: 300),
+  })  : assert(!routerName.contains('/:'),
+            'ModuleRoute should not contain dynamic route'),
+        super(routerName,
+            routerOutlet: [],
+            duration: duration,
+            routeGenerator: routeGenerator,
+            module: module,
+            customTransition: customTransition,
+            guards: guards,
+            transition: transition);
+}
+
 class MyChildRoute<T> extends _ModularRouteImpl<T> {
   MyChildRoute(
     String routerName, {

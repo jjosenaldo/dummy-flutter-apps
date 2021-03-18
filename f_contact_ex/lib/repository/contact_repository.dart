@@ -21,10 +21,11 @@ abstract class ContactRepository {
 
   Future<List<Contact>> findByName(String name);
 
-  Future<void> update({
+  Future<void> updateById({
     required int id,
-    required String name,
-    required String phone,
+    String? name,
+    String? phone,
     String? photoName,
+    String? email,
   });
 }
