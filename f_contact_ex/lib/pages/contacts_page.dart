@@ -1,4 +1,5 @@
 import 'package:f_contact_ex/model/contact.dart';
+import 'package:f_contact_ex/repository/contact_repository.dart';
 import 'package:f_contact_ex/store/contact_store.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
@@ -15,8 +16,12 @@ class ContactsPage extends StatelessWidget {
         centerTitle: true,
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Modular.to.pushNamed('add');
+        onPressed: () async {
+          final contactInsertParams =
+              await Modular.to.pushNamed<ContactInsertParams>('add');
+          if (contactInsertParams != null) {
+            _contactStore.insertContact(contactInsertParams);
+          }
         },
         child: Icon(Icons.add),
       ),
@@ -45,7 +50,7 @@ class ContactCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      title: Text(contact.name),
+      title: Text(contact.name, style: TextStyle(fontWeight: FontWeight.w600)),
       subtitle: Text('${contact.email}\n${contact.phone}'),
       isThreeLine: true,
     );

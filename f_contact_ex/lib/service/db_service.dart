@@ -36,13 +36,20 @@ class DBService {
         join(maybeDatabasesPath, _kDatabaseName),
         onCreate: (db, version) async {
           await db.execute(
-            'CREATE TABLE $kTableName ($kIdColumnName INTEGER PRIMARY KEY AUTOINCREMENT, $kNameColumnName TEXT, $kPhoneColumnName TEXT, $kPhotoNameColumnName TEXT)',
+            'CREATE TABLE $kTableName ($kIdColumnName INTEGER PRIMARY KEY AUTOINCREMENT, $kNameColumnName TEXT, $kPhoneColumnName TEXT, $kEmailColumnName TEXT, $kPhotoNameColumnName TEXT)',
           );
         },
-        version: 1,
+        version: 3,
+        onUpgrade: _onUpgrade,
       );
     } else {
       throw NullDatabasesPathException();
+    }
+  }
+
+  void _onUpgrade(Database db, int oldVersion, int newVersion) {
+    if (oldVersion < newVersion) {
+      db.execute("ALTER TABLE $kTableName ADD COLUMN $kEmailColumnName TEXT;");
     }
   }
 

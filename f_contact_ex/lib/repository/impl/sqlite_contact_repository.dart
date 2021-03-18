@@ -13,25 +13,24 @@ class SQLiteContactRepository implements ContactRepository {
   }
 
   @override
-  Future<Contact?> insert({
-    required String name,
-    required String phone,
-    required String email,
-    String? photoName,
-  }) async {
+  Future<Contact?> insert(ContactInsertParams params) async {
     final insertedId = await _dbService.insert(
       tableName: kTableName,
       data: buildDatabaseInsertJson(
-        email: email,
-        name: name,
-        phone: phone,
-        photoName: photoName,
+        email: params.email,
+        name: params.name,
+        phone: params.phone,
+        photoName: params.photoName,
       ),
     );
 
     return insertedId == null
         ? null
-        : Contact(id: insertedId, name: name, email: email, phone: phone);
+        : Contact(
+            id: insertedId,
+            name: params.name,
+            email: params.email,
+            phone: params.phone);
   }
 
   Future<List<Contact>> findAll() async {

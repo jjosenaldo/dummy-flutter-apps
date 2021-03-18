@@ -1,14 +1,24 @@
+import 'package:f_contact_ex/repository/contact_repository.dart';
 import 'package:mobx/mobx.dart';
 
-class AddContactStore {
-  final _name = Observable<String>('');
-  final _email = Observable<String>('');
-  final _phone = Observable<String>('');
-  final _photoName = Observable<String?>('');
+part 'add_contact_store.g.dart';
 
-  set name(String name) => Action(() => _name.value = name)();
-  set email(String email) => Action(() => _email.value = email)();
-  set phone(String phone) => Action(() => _phone.value = phone)();
-  set photoName(String? photoName) =>
-      Action(() => _photoName.value = photoName)();
+class AddContactStore = _AddContactStore with _$AddContactStore;
+
+abstract class _AddContactStore with Store {
+  @observable
+  String name = '';
+
+  @observable
+  String email = '';
+
+  @observable
+  String phone = '';
+
+  @observable
+  String? photoName = '';
+
+  @computed
+  ContactInsertParams get contactInsertParams => ContactInsertParams(
+      name: name, phone: phone, email: email, photoName: photoName);
 }

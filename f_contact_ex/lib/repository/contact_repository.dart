@@ -1,12 +1,21 @@
 import 'package:f_contact_ex/model/contact.dart';
 
-abstract class ContactRepository {
-  Future<Contact?> insert({
-    required String name,
-    required String phone,
-    required String email,
-    String? photoName,
+class ContactInsertParams {
+  ContactInsertParams({
+    required this.name,
+    required this.phone,
+    required this.email,
+    this.photoName,
   });
+
+  final String name;
+  final String phone;
+  final String email;
+  String? photoName;
+}
+
+abstract class ContactRepository {
+  Future<Contact?> insert(ContactInsertParams params);
 
   Future<List<Contact>> findAll();
 

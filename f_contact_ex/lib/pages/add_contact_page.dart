@@ -1,3 +1,4 @@
+import 'package:f_contact_ex/repository/contact_repository.dart';
 import 'package:f_contact_ex/store/add_contact_store.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
@@ -10,6 +11,13 @@ class AddContactPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Modular.to
+              .pop<ContactInsertParams>(_addContactStore.contactInsertParams);
+        },
+        child: Icon(Icons.save),
+      ),
       appBar: AppBar(
         title: Text('Novo contato'),
         centerTitle: true,
