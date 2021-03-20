@@ -15,7 +15,7 @@ abstract class _ContactPageStore with Store {
 
   Future<void> savePhotoToDisk() async {
     if (photo != null && photoName != null) {
-      photo!.writeAsBytes(photo!.readAsBytesSync());
+      await photo!.writeAsBytes(photo!.readAsBytesSync());
     }
   }
 

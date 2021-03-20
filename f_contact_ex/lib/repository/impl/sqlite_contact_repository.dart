@@ -32,7 +32,9 @@ class SQLiteContactRepository implements ContactRepository {
             id: insertedId,
             name: params.name,
             email: params.email,
-            phone: params.phone);
+            phone: params.phone,
+            photoName: params.photoName,
+          );
   }
 
   Future<List<Contact>> findAll() async {

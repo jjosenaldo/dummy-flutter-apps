@@ -1,5 +1,6 @@
 import 'package:f_contact_ex/repository/contact_repository.dart';
 import 'package:f_contact_ex/store/contact_page_store.dart';
+import 'package:f_contact_ex/widgets/image_or_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_modular/flutter_modular.dart';
@@ -87,9 +88,10 @@ class ContactPage extends StatelessWidget {
                 children: [
                   Observer(
                     builder: (_) => GestureDetector(
-                      child: _contactStore.photo != null
-                          ? Image.file(_contactStore.photo!)
-                          : Icon(Icons.person),
+                      child: ImageOrIcon(
+                        imageSource: _contactStore.photoName,
+                        size: 100,
+                      ),
                       onTap: () => _imagePicker
                           .getImage(
                         source: ImageSource.camera,
