@@ -25,6 +25,7 @@ dependencies:
       ref: 1a662d6c51b57b6ecd6cc365bc029ad1e82a031e
       path: mobx_codegen
   sqflite: ^2.0.0+2
+  url_launcher: ^6.0.2
 
 dev_dependencies:
   flutter_test:

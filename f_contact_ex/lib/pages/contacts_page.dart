@@ -6,6 +6,7 @@ import 'package:f_contact_ex/store/contacts_store.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_modular/flutter_modular.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'contact_page.dart';
 
@@ -44,7 +45,9 @@ class ContactsPage extends StatelessWidget {
                 context: screenContext,
                 builder: (modalSheetContext) => BottomSheet(
                   builder: (context) => ContactMenu(
-                    callCallback: () {},
+                    callCallback: () => _makePhoneCall(
+                      _contactStore.contacts[index].phone,
+                    ),
                     deleteCallback: () {
                       _contactStore
                           .deleteContact(_contactStore.contacts[index])
@@ -84,6 +87,10 @@ class ContactsPage extends StatelessWidget {
     if (returnValue != null && returnValue is ContactUpdateByIdParams) {
       _contactStore.updateContact(returnValue);
     }
+  }
+
+  Future<void> _makePhoneCall(String phoneNumber) async {
+    await launch('tel:$phoneNumber');
   }
 }
 
