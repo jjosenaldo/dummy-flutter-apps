@@ -79,4 +79,12 @@ class SQLiteContactRepository implements ContactRepository {
       return Future<void>.value();
     }
   }
+
+  Future<bool> deleteById(int id) => _dbService
+      .deleteBy(
+        tableName: kTableName,
+        columnName: kIdColumnName,
+        columnValue: id,
+      )
+      .then((contRowsDeleted) => contRowsDeleted > 0);
 }

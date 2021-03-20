@@ -44,4 +44,6 @@ abstract class ContactRepository {
     String? photoName,
     String? email,
   });
+
+  Future<bool> deleteById(int id);
 }

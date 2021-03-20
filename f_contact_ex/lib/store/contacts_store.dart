@@ -45,4 +45,11 @@ abstract class _ContactsStore with Store {
       _contacts.add(maybeNewContact);
     }
   }
+
+  Future<void> deleteContact(Contact contact) =>
+      repository.deleteById(contact.id).then((deleted) {
+        if (deleted) {
+          _contacts.remove(contact);
+        }
+      });
 }

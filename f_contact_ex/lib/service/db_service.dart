@@ -97,4 +97,17 @@ class DBService {
       whereArgs: [columnValue],
     );
   }
+
+  Future<int> deleteBy({
+    required String tableName,
+    required String columnName,
+    required Object columnValue,
+  }) async {
+    final database = await getDatabase();
+    return database.delete(
+      tableName,
+      where: '$columnName = ?',
+      whereArgs: [columnValue],
+    );
+  }
 }

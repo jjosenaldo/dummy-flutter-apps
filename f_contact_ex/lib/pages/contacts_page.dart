@@ -45,7 +45,11 @@ class ContactsPage extends StatelessWidget {
                 builder: (modalSheetContext) => BottomSheet(
                   builder: (context) => ContactMenu(
                     callCallback: () {},
-                    deleteCallback: () {},
+                    deleteCallback: () {
+                      _contactStore
+                          .deleteContact(_contactStore.contacts[index])
+                          .then((_) => Navigator.pop(modalSheetContext));
+                    },
                     editCallback: () => _goToEditPage(
                       _contactStore.contacts[index],
                       modalSheetContext,
