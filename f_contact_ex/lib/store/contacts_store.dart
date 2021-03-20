@@ -21,6 +21,24 @@ abstract class _ContactsStore with Store {
   }
 
   @action
+  Future<void> updateContact(ContactUpdateByIdParams params) async {
+    await repository.updateById(
+      id: params.id,
+      email: params.email,
+      name: params.name,
+      phone: params.phone,
+      photoName: params.photoName,
+    );
+    final maybeEditedContact = await repository.findById(params.id);
+
+    if (maybeEditedContact != null) {
+      final editedContactIndex = _contacts.indexOf(maybeEditedContact);
+      _contacts.replaceRange(
+          editedContactIndex, editedContactIndex + 1, [maybeEditedContact]);
+    }
+  }
+
+  @action
   Future<void> insertContact(ContactInsertParams params) async {
     final maybeNewContact = await repository.insert(params);
     if (maybeNewContact != null) {

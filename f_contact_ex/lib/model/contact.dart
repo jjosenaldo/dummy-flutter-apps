@@ -1,4 +1,6 @@
-class Contact {
+import 'package:equatable/equatable.dart';
+
+class Contact extends Equatable {
   Contact({
     required this.id,
     required this.name,
@@ -17,4 +19,7 @@ class Contact {
   String toString() {
     return '[$id] $name, $phone, $email, ${photoName ?? ''}';
   }
+
+  @override
+  List<Object> get props => [id];
 }

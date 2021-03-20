@@ -1,17 +1,28 @@
-import 'package:f_contact_ex/model/contact.dart';
 import 'package:f_contact_ex/repository/contact_repository.dart';
 import 'package:f_contact_ex/store/contact_page_store.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 
-class ContactPage extends StatelessWidget {
-  ContactPage({
-    Key? key,
-    this.contact,
-  }) : super(key: key);
+enum ContactPageType {
+  insert,
+  edit,
+}
 
-  final Contact? contact;
+class ContactPageParams {
+  ContactPageParams({required this.pageType});
+  final ContactPageType pageType;
+}
+
+class ContactPage extends StatelessWidget {
+  ContactPage(
+    this.params, {
+    Key? key,
+  })  : _pageType = params.pageType,
+        super(key: key);
+
+  final ContactPageType _pageType;
+  final ContactPageParams params;
 
   final _formKey = GlobalKey<FormState>();
   final _contactStore = Modular.get<ContactPageStore>();
@@ -21,8 +32,18 @@ class ContactPage extends StatelessWidget {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Modular.to
-              .pop<ContactInsertParams>(_contactStore.contactInsertParams);
+          switch (_pageType) {
+            case ContactPageType.insert:
+              Modular.to.pop<ContactInsertParams>(
+                _contactStore.contactInsertParams,
+              );
+              break;
+            case ContactPageType.edit:
+              Modular.to.pop<ContactUpdateByIdParams>(
+                _contactStore.contactUpdateByIdParams,
+              );
+              break;
+          }
         },
         child: Icon(Icons.save),
       ),
@@ -42,18 +63,21 @@ class ContactPage extends StatelessWidget {
                   builder: (_) => TextFormField(
                     decoration: const InputDecoration(hintText: 'Nome'),
                     onChanged: (newName) => _contactStore.name = newName,
+                    initialValue: _contactStore.originalName,
                   ),
                 ),
                 Observer(
                   builder: (_) => TextFormField(
                     decoration: const InputDecoration(hintText: 'Email'),
                     onChanged: (newEmail) => _contactStore.email = newEmail,
+                    initialValue: _contactStore.originalEmail,
                   ),
                 ),
                 Observer(
                   builder: (_) => TextFormField(
                     decoration: const InputDecoration(hintText: 'Telefone'),
                     onChanged: (newPhone) => _contactStore.phone = newPhone,
+                    initialValue: _contactStore.originalPhone,
                   ),
                 ),
               ],

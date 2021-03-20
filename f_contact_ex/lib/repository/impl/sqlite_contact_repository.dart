@@ -42,8 +42,18 @@ class SQLiteContactRepository implements ContactRepository {
         .toList();
   }
 
-  Future<List<Contact>> findByName(String name) {
-    return Future.value([]);
+  Future<Contact?> findById(int id) async {
+    final jsons = await _dbService.findByEqualTo(
+      tableName: kTableName,
+      columnName: kIdColumnName,
+      columnValue: id,
+    );
+
+    if (jsons.isEmpty) {
+      return null;
+    } else {
+      return buildContactFromQueryJson(jsons[0]);
+    }
   }
 
   Future<void> updateById({

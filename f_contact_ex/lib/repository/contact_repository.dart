@@ -1,5 +1,21 @@
 import 'package:f_contact_ex/model/contact.dart';
 
+class ContactUpdateByIdParams {
+  ContactUpdateByIdParams({
+    required this.id,
+    this.name,
+    this.phone,
+    this.photoName,
+    this.email,
+  });
+
+  final int id;
+  final String? name;
+  final String? phone;
+  final String? photoName;
+  final String? email;
+}
+
 class ContactInsertParams {
   ContactInsertParams({
     required this.name,
@@ -19,7 +35,7 @@ abstract class ContactRepository {
 
   Future<List<Contact>> findAll();
 
-  Future<List<Contact>> findByName(String name);
+  Future<Contact?> findById(int id);
 
   Future<void> updateById({
     required int id,

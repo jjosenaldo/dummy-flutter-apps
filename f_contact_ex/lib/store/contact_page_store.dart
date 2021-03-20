@@ -7,16 +7,33 @@ part 'contact_page_store.g.dart';
 class ContactPageStore = _ContactPageStore with _$ContactPageStore;
 
 abstract class _ContactPageStore with Store {
-  _ContactPageStore(Contact? contact)
-      : originalName = contact?.name,
-        originalPhone = contact?.phone,
-        originalPhotoName = contact?.photoName,
-        originalEmail = contact?.email;
+  @action
+  void setFields(Contact? maybeContact) {
+    originalName = maybeContact?.name;
+    originalPhotoName = maybeContact?.photoName;
+    originalEmail = maybeContact?.email;
+    originalPhone = maybeContact?.phone;
 
-  final String? originalName;
-  final String? originalEmail;
-  final String? originalPhone;
-  final String? originalPhotoName;
+    name = maybeContact?.name ?? '';
+    photoName = maybeContact?.photoName;
+    email = maybeContact?.email ?? '';
+    phone = maybeContact?.phone ?? '';
+
+    if (maybeContact != null) {
+      id = maybeContact.id;
+    }
+  }
+
+  _ContactPageStore() {
+    setFields(null);
+  }
+
+  String? originalName;
+  String? originalEmail;
+  String? originalPhone;
+  String? originalPhotoName;
+
+  late int id;
 
   @observable
   String name = '';
@@ -28,9 +45,22 @@ abstract class _ContactPageStore with Store {
   String phone = '';
 
   @observable
-  String? photoName = '';
+  String? photoName;
 
   @computed
   ContactInsertParams get contactInsertParams => ContactInsertParams(
-      name: name, phone: phone, email: email, photoName: photoName);
+        name: name,
+        phone: phone,
+        email: email,
+        photoName: photoName,
+      );
+  @computed
+  ContactUpdateByIdParams get contactUpdateByIdParams =>
+      ContactUpdateByIdParams(
+        id: id,
+        email: email != originalEmail ? email : null,
+        name: name != originalName ? name : null,
+        photoName: photoName != originalPhotoName ? photoName : null,
+        phone: phone != originalPhone ? phone : null,
+      );
 }
