@@ -33,3 +33,11 @@ Your almost-average todo list app.
 - RefreshIndicator;
 - Persistence in the documents path.
 
+### [f_contact](f_contact_ex/) (Flutter 2.0)
+Your slightly-above-average contact list app.
+
+This app was built with [mobx](https://pub.dev/packages/mobx) for state management and [flutter_modular](https://pub.dev/packages/flutter_modular) for depency injection and navigation. I had some problems because, by the time I made the app, [mobx_codegen](https://pub.dev/packages/mobx_codegen) didn't have a stable null-safe version, and flutter_modular's latest version was kinda unstable as well.
+
+#### Features
+- Local storage persistence with SQLite.
+- Saving a photo from camera for each contact.
