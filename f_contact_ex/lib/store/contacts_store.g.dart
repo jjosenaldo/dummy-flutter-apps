@@ -17,6 +17,14 @@ mixin _$ContactsStore on _ContactsStore, Store {
               name: '_ContactsStore.contacts'))
           .value;
 
+  final _$updateContactAsyncAction =
+      AsyncAction('_ContactsStore.updateContact');
+
+  @override
+  Future<void> updateContact(ContactUpdateByIdParams params) {
+    return _$updateContactAsyncAction.run(() => super.updateContact(params));
+  }
+
   final _$insertContactAsyncAction =
       AsyncAction('_ContactsStore.insertContact');
 

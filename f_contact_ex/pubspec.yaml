@@ -17,6 +17,7 @@ dependencies:
   flutter_mobx: ^2.0.0-nullsafety.1
   flutter_modular: ^3.0.1
   get_it: ^6.0.0
+  image_picker: ^0.7.3
   mask_text_input_formatter: ^2.0.0-nullsafety.2
   mobx: ^2.0.0-nullsafety.3
   mobx_codegen:

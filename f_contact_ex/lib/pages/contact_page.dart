@@ -3,6 +3,7 @@ import 'package:f_contact_ex/store/contact_page_store.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_modular/flutter_modular.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
 enum ContactPageType {
@@ -27,6 +28,7 @@ class ContactPage extends StatelessWidget {
 
   final _formKey = GlobalKey<FormState>();
   final _contactStore = Modular.get<ContactPageStore>();
+  final _imagePicker = ImagePicker();
 
   Future<bool> showScreenCloseDialog(BuildContext context) => showDialog<bool>(
         context: context,
@@ -52,8 +54,10 @@ class ContactPage extends StatelessWidget {
       onWillPop: () => showScreenCloseDialog(context),
       child: Scaffold(
         floatingActionButton: FloatingActionButton(
-          onPressed: () {
+          onPressed: () async {
             if (_formKey.currentState?.validate() ?? false) {
+              await _contactStore.savePhotoToDisk();
+
               switch (_pageType) {
                 case ContactPageType.insert:
                   Modular.to.pop<ContactInsertParams>(
@@ -81,7 +85,22 @@ class ContactPage extends StatelessWidget {
               key: _formKey,
               child: Column(
                 children: [
-                  const Icon(Icons.person),
+                  Observer(
+                    builder: (_) => GestureDetector(
+                      child: _contactStore.photo != null
+                          ? Image.file(_contactStore.photo!)
+                          : Icon(Icons.person),
+                      onTap: () => _imagePicker
+                          .getImage(
+                        source: ImageSource.camera,
+                      )
+                          .then((pickedImage) {
+                        if (pickedImage != null) {
+                          _contactStore.setPhotoFromPath(pickedImage.path);
+                        }
+                      }),
+                    ),
+                  ),
                   Observer(
                     builder: (_) => TextFormField(
                       decoration: const InputDecoration(hintText: 'Nome'),

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:f_contact_ex/model/contact.dart';
 import 'package:f_contact_ex/repository/contact_repository.dart';
 import 'package:flutter_modular/flutter_modular.dart';
@@ -47,9 +49,12 @@ abstract class _ContactsStore with Store {
   }
 
   Future<void> deleteContact(Contact contact) =>
-      repository.deleteById(contact.id).then((deleted) {
+      repository.deleteById(contact.id).then((deleted) async {
         if (deleted) {
           _contacts.remove(contact);
+          if (contact.photoName != null) {
+            await File(contact.photoName!).delete();
+          }
         }
       });
 }

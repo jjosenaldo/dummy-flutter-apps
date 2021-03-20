@@ -41,5 +41,9 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>NSCameraUsageDescription</key>
+	<string>The user might upload a camera photo for using as some contact's picture.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>The user might upload a gallery photo for using as some contact's picture.</string>
 </dict>
 </plist>
