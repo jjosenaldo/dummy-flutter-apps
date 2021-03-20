@@ -3,6 +3,7 @@ import 'package:f_contact_ex/store/contact_page_store.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_modular/flutter_modular.dart';
+import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
 enum ContactPageType {
   insert,
@@ -52,17 +53,19 @@ class ContactPage extends StatelessWidget {
       child: Scaffold(
         floatingActionButton: FloatingActionButton(
           onPressed: () {
-            switch (_pageType) {
-              case ContactPageType.insert:
-                Modular.to.pop<ContactInsertParams>(
-                  _contactStore.contactInsertParams,
-                );
-                break;
-              case ContactPageType.edit:
-                Modular.to.pop<ContactUpdateByIdParams>(
-                  _contactStore.contactUpdateByIdParams,
-                );
-                break;
+            if (_formKey.currentState?.validate() ?? false) {
+              switch (_pageType) {
+                case ContactPageType.insert:
+                  Modular.to.pop<ContactInsertParams>(
+                    _contactStore.contactInsertParams,
+                  );
+                  break;
+                case ContactPageType.edit:
+                  Modular.to.pop<ContactUpdateByIdParams>(
+                    _contactStore.contactUpdateByIdParams,
+                  );
+                  break;
+              }
             }
           },
           child: Icon(Icons.save),
@@ -84,6 +87,11 @@ class ContactPage extends StatelessWidget {
                       decoration: const InputDecoration(hintText: 'Nome'),
                       onChanged: (newName) => _contactStore.name = newName,
                       initialValue: _contactStore.originalName,
+                      validator: (maybeNome) =>
+                          (maybeNome == null || maybeNome.isEmpty)
+                              ? 'Campo obrigatório'
+                              : null,
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
                     ),
                   ),
                   Observer(
@@ -91,6 +99,15 @@ class ContactPage extends StatelessWidget {
                       decoration: const InputDecoration(hintText: 'Email'),
                       onChanged: (newEmail) => _contactStore.email = newEmail,
                       initialValue: _contactStore.originalEmail,
+                      keyboardType: TextInputType.emailAddress,
+                      validator: (maybeEmail) => (maybeEmail == null ||
+                              maybeEmail.isEmpty)
+                          ? 'Campo obrigatório'
+                          : RegExp(r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?)*$")
+                                  .hasMatch(maybeEmail)
+                              ? null
+                              : 'Email inválido',
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
                     ),
                   ),
                   Observer(
@@ -98,6 +115,25 @@ class ContactPage extends StatelessWidget {
                       decoration: const InputDecoration(hintText: 'Telefone'),
                       onChanged: (newPhone) => _contactStore.phone = newPhone,
                       initialValue: _contactStore.originalPhone,
+                      inputFormatters: [
+                        MaskTextInputFormatter(
+                          mask: '(##) #####-####',
+                          filter: {"#": RegExp(r'[0-9]')},
+                        ),
+                      ],
+                      keyboardType: TextInputType.number,
+                      validator: (maybePhoneNumber) {
+                        if (maybePhoneNumber == null ||
+                            maybePhoneNumber.isEmpty) {
+                          return 'Campo obrigatório';
+                        }
+
+                        if (maybePhoneNumber.length < 2 + 5 + 4 + 3 + 1) {
+                          return 'Telefone incompleto';
+                        }
+                        return null;
+                      },
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
                     ),
                   ),
                 ],
