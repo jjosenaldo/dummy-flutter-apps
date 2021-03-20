@@ -27,60 +27,81 @@ class ContactPage extends StatelessWidget {
   final _formKey = GlobalKey<FormState>();
   final _contactStore = Modular.get<ContactPageStore>();
 
+  Future<bool> showScreenCloseDialog(BuildContext context) => showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('Abandonar alteração?'),
+          content: Text('Os dados serão perdidos.'),
+          actions: [
+            TextButton(
+              child: Text('Cancelar'),
+              onPressed: () => Navigator.of(context).pop(false),
+            ),
+            TextButton(
+              child: Text('Sim'),
+              onPressed: () => Navigator.of(context).pop(true),
+            ),
+          ],
+        ),
+      ).then((maybeResult) => maybeResult ?? false);
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          switch (_pageType) {
-            case ContactPageType.insert:
-              Modular.to.pop<ContactInsertParams>(
-                _contactStore.contactInsertParams,
-              );
-              break;
-            case ContactPageType.edit:
-              Modular.to.pop<ContactUpdateByIdParams>(
-                _contactStore.contactUpdateByIdParams,
-              );
-              break;
-          }
-        },
-        child: Icon(Icons.save),
-      ),
-      appBar: AppBar(
-        title: Text('Novo contato'),
-        centerTitle: true,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
-        child: SingleChildScrollView(
-          child: Form(
-            key: _formKey,
-            child: Column(
-              children: [
-                const Icon(Icons.person),
-                Observer(
-                  builder: (_) => TextFormField(
-                    decoration: const InputDecoration(hintText: 'Nome'),
-                    onChanged: (newName) => _contactStore.name = newName,
-                    initialValue: _contactStore.originalName,
+    return WillPopScope(
+      onWillPop: () => showScreenCloseDialog(context),
+      child: Scaffold(
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            switch (_pageType) {
+              case ContactPageType.insert:
+                Modular.to.pop<ContactInsertParams>(
+                  _contactStore.contactInsertParams,
+                );
+                break;
+              case ContactPageType.edit:
+                Modular.to.pop<ContactUpdateByIdParams>(
+                  _contactStore.contactUpdateByIdParams,
+                );
+                break;
+            }
+          },
+          child: Icon(Icons.save),
+        ),
+        appBar: AppBar(
+          title: Text('Novo contato'),
+          centerTitle: true,
+        ),
+        body: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+          child: SingleChildScrollView(
+            child: Form(
+              key: _formKey,
+              child: Column(
+                children: [
+                  const Icon(Icons.person),
+                  Observer(
+                    builder: (_) => TextFormField(
+                      decoration: const InputDecoration(hintText: 'Nome'),
+                      onChanged: (newName) => _contactStore.name = newName,
+                      initialValue: _contactStore.originalName,
+                    ),
                   ),
-                ),
-                Observer(
-                  builder: (_) => TextFormField(
-                    decoration: const InputDecoration(hintText: 'Email'),
-                    onChanged: (newEmail) => _contactStore.email = newEmail,
-                    initialValue: _contactStore.originalEmail,
+                  Observer(
+                    builder: (_) => TextFormField(
+                      decoration: const InputDecoration(hintText: 'Email'),
+                      onChanged: (newEmail) => _contactStore.email = newEmail,
+                      initialValue: _contactStore.originalEmail,
+                    ),
                   ),
-                ),
-                Observer(
-                  builder: (_) => TextFormField(
-                    decoration: const InputDecoration(hintText: 'Telefone'),
-                    onChanged: (newPhone) => _contactStore.phone = newPhone,
-                    initialValue: _contactStore.originalPhone,
+                  Observer(
+                    builder: (_) => TextFormField(
+                      decoration: const InputDecoration(hintText: 'Telefone'),
+                      onChanged: (newPhone) => _contactStore.phone = newPhone,
+                      initialValue: _contactStore.originalPhone,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
